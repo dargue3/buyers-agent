@@ -24,8 +24,8 @@ def load_pdf(pdf_path, pinecone_index):
     
     # Create vector store with namespace based on file hash
     vector_store = PineconeVectorStore(
-        pinecone_index=pinecone_index,
-        namespace=file_hash
+        namespace="disclosures",
+        pinecone_index=pinecone_index
     )
     
     # Check if vectors exist for this document
