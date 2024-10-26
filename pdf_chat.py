@@ -1,11 +1,13 @@
 import os
 from pathlib import Path
 from dotenv import load_dotenv
-from llama_index.core import VectorStoreIndex, SimpleDirectoryReader
+from llama_index.core import VectorStoreIndex, SimpleDirectoryReader, Settings
 from llama_index.llms.openai import OpenAI
 
 def init_environment():
     load_dotenv()
+    # Initialize OpenAI as the default LLM
+    Settings.llm = OpenAI(model="gpt-3.5-turbo", temperature=0.7)
 
 def load_pdf(pdf_path):
     if not Path(pdf_path).exists():
