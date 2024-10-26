@@ -28,8 +28,16 @@ def load_pdf(pdf_path, pinecone_index):
         pinecone_index=pinecone_index
     )
     
-    # Check if vectors exist for this document
-    if vector_store.get_vector_count() > 0:
+    # Check if vectors exist for this document by querying with metadata filter
+    existing_vectors = pinecone_index.query(
+        vector=[0] * 1536,  # dummy vector of correct dimension
+        top_k=1,
+        filter={
+            "file_path": str(pdf_path)
+        }
+    )
+    
+    if existing_vectors.matches:
         print("\n=== Found existing vectors in Pinecone, loading index ===")
         storage_context = StorageContext.from_defaults(vector_store=vector_store)
         index = VectorStoreIndex.from_vector_store(
