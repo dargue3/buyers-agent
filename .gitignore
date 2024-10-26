@@ -28,7 +28,6 @@ MANIFEST
 venv/
 env/
 ENV/
-.env
 .venv
 
 # PyCharm
@@ -51,7 +50,6 @@ coverage.xml
 cover/
 
 # FastAPI
-.env
 .env.local
 .env.*.local
 
