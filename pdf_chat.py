@@ -12,8 +12,26 @@ def load_pdf(pdf_path):
     if not Path(pdf_path).exists():
         raise FileNotFoundError(f"PDF file not found at {pdf_path}")
     
+    print("\n=== Loading PDF Document ===")
     documents = SimpleDirectoryReader(input_files=[pdf_path]).load_data()
+    
+    # Debug information about loaded documents
+    print(f"\nFound {len(documents)} document(s)")
+    for i, doc in enumerate(documents):
+        print(f"\nDocument {i+1}:")
+        print(f"Length: {len(doc.text)} characters")
+        print(f"First 200 characters: {doc.text[:200]}...")
+        print(f"Metadata: {doc.metadata}")
+    
+    print("\n=== Creating Vector Index ===")
     index = VectorStoreIndex.from_documents(documents)
+    
+    # Debug information about the index
+    print(f"\nIndex Stats:")
+    print(f"Number of nodes: {len(index.docstore.docs)}")
+    print(f"Embedding model: {Settings.embed_model}")
+    print(f"LLM model: {Settings.llm}")
+    
     return index.as_query_engine()
 
 def chat_with_pdf():
