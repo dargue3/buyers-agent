@@ -6,8 +6,7 @@ from llama_index.llms.openai import OpenAI
 
 def init_environment():
     load_dotenv()
-    # Initialize OpenAI as the default LLM
-    Settings.llm = OpenAI(model="gpt-3.5-turbo", temperature=0.7)
+    Settings.llm = OpenAI(model="gpt-4o", temperature=0.2)
 
 def load_pdf(pdf_path):
     if not Path(pdf_path).exists():
