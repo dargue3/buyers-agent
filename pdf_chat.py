@@ -1,8 +1,8 @@
 import os
 from pathlib import Path
 from dotenv import load_dotenv
-from llama_index import VectorStoreIndex, SimpleDirectoryReader
-from llama_index.llms import OpenAI
+from llama_index.core import VectorStoreIndex, SimpleDirectoryReader
+from llama_index.llms.openai import OpenAI
 
 def init_environment():
     load_dotenv()
