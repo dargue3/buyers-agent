@@ -1,4 +1,7 @@
 import os
+import warnings
+import urllib3
+warnings.filterwarnings("ignore", category=urllib3.exceptions.NotOpenSSLWarning)
 from dotenv import load_dotenv
 from llama_index.core import Settings
 from llama_index.llms.openai import OpenAI
@@ -17,8 +20,12 @@ def init_environment():
     if index_name not in pc.list_indexes().names():
         pc.create_index(
             name=index_name,
-            dimension=1536,
-            metric="cosine"
+            spec=pc.PodSpec(
+                environment="gcp-starter",
+                pod_type="starter",
+                metric="cosine",
+                dimension=1536
+            )
         )
     
     return pc.Index(index_name)
