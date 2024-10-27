@@ -29,4 +29,10 @@ def get_pinecone_index():
 
 def get_openai_env_vars():
     """Return the OpenAI environment variables"""
-    return os.getenv("OPENAI_API_KEY"), os.getenv("OPENAI_API_BASE")
+    api_key = os.getenv("OPENAI_API_KEY")
+    api_base = os.getenv("OPENAI_API_BASE")
+    
+    if not api_key:
+        raise ValueError("OPENAI_API_KEY environment variable not set")
+    
+    return api_key, api_base
