@@ -10,7 +10,7 @@ from llama_index.core import (
 
 def get_query_engine_from_pinecone(index, namespace="disclosures"):
     """Get a query engine from a Pinecone index"""
-    vectore_store = PineconeVectorStore(namespace,pinecone_index=index)
+    vector_store = PineconeVectorStore(pinecone_index=index, namespace=namespace)
     storage_context = StorageContext.from_defaults(vector_store=vectore_store)
     index = VectorStoreIndex.from_vector_store(vectore_store, storage_context=storage_context)
     return index.as_query_engine()
