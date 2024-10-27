@@ -1,6 +1,6 @@
-from braintrust import Eval
-from autoevals import AnswerCorrectness
-from src.environment import init_environment
+from autoevals import OpenAIScorer
+from braintrust import Eval, wrap_openai
+from src.environment import get_openai_env_vars, init_environment
 from src.parsing.pdf_loader import load_pdf_as_query_engine
 
 def setup_chat():
@@ -13,16 +13,34 @@ llm = setup_chat()
 def run_evals():
     Eval(
         "Closing Disclosure",
-        scores=[AnswerCorrectness],
-        task=lambda input: llm.query(input),
+        scores=[
+            OpenAIScorer(get_openai_env_vars()),
+        ],
+        task=lambda input: llm.query(input).response,
         data=lambda: [
             {
-                "input": "what is the name of the settlement agent?",
+                "input": "what is the first and last name of the settlement agent?",
                 "expected": "Sarah Arnold",
             },
             {
                 "input": "what is the address of the home that is being sold in this transaction?",
                 "expected": "456 Somewhere Ave, Anytown, ST 12345",
+            },
+            {
+                "input": "how much can the buyer expect to pay per month in their first year of ownership?",
+                "expected": "$1,050.26",
+            },
+            {
+                "input": "how much cash in total was given to the seller in this transaction?",
+                "expected": "$64,414.96",
+            },
+            {
+                "input": "Answer Yes or no, does the state law protect the buyer from liability for the unpaid balance if their lender forecloses?",
+                "expected": "Yes",
+            },
+            {
+                "input": "Answer Yes or no, has this contract been signed by both parties?",
+                "expected": "No",
             },
         ],
     )

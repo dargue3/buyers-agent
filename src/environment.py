@@ -10,10 +10,21 @@ from pinecone import Pinecone
 def init_environment():
     """Initialize environment variables and Pinecone connection"""
     load_dotenv()
-    Settings.llm = OpenAI(model="gpt-4o", temperature=0.2)
-    
-    # Initialize Pinecone
-    pc = Pinecone(api_key=os.getenv("PINECONE_API_KEY"))
-    index_name = os.getenv("PINECONE_INDEX_NAME")
-    
-    return pc.Index(index_name)
+    setup_llama_index()
+    return get_pinecone_index()
+
+def setup_llama_index():
+    """Setup Llama Index"""
+    Settings.llm = get_open_ai_model()
+
+def get_open_ai_model():
+    """Get OpenAI instance"""
+    return OpenAI(model="gpt-4o", temperature=0.2)
+
+def get_pinecone_index():
+    """Get Pinecone index"""
+    return Pinecone(api_key=os.getenv("PINECONE_API_KEY")).Index(os.getenv("PINECONE_INDEX_NAME"))
+
+def get_openai_env_vars():
+    """Get environment variables for OpenAI"""
+    return {"api_key": os.getenv("OPENAI_API_KEY"), "base_url": os.getenv("OPENAI_API_BASE")}
