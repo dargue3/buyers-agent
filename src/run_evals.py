@@ -1,5 +1,5 @@
 from src.environment import init_environment
-from .parsing.pdf_loader import get_query_engine_from_pinecone
+from .parsing.pinecone_pdf_loader import get_query_engine_from_pinecone
 from .evals.closing_disclosure import run_evals
 
 pinecone_index = init_environment()

@@ -1,7 +1,7 @@
-from autoevals import OpenAIScorer
-from braintrust import Eval, wrap_openai
-from src.environment import create_openai_scorer, init_environment
-from src.parsing.pdf_loader import load_pdf_as_query_engine
+from braintrust import Eval
+from autoevals import Factuality
+from src.environment import get_openai_env_vars, init_environment
+from src.parsing.pinecone_pdf_loader import load_pdf_as_query_engine
 
 def setup_chat():
     pinecone_index = init_environment()
@@ -10,12 +10,12 @@ def setup_chat():
 
 llm = setup_chat()
 
+api_key, base_url = get_openai_env_vars()
+
 def run_evals():
     Eval(
         "Closing Disclosure",
-        scores=[
-            create_openai_scorer(OpenAIScorer),
-        ],
+        scores=[Factuality(api_key=api_key, base_url=base_url)],
         task=lambda input: llm.query(input).response,
         data=lambda: [
             {

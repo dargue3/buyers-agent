@@ -7,6 +7,8 @@ from llama_index.core import Settings
 from llama_index.llms.openai import OpenAI
 from pinecone import Pinecone
 
+load_dotenv()
+
 def init_environment():
     """Initialize environment variables and Pinecone connection"""
     load_dotenv()
@@ -25,9 +27,6 @@ def get_pinecone_index():
     """Get Pinecone index"""
     return Pinecone(api_key=os.getenv("PINECONE_API_KEY")).Index(os.getenv("PINECONE_INDEX_NAME"))
 
-def create_openai_scorer(scorer_class):
-    """Create an OpenAI scorer with environment variables"""
-    return scorer_class(
-        api_key=os.getenv("OPENAI_API_KEY"),
-        base_url=os.getenv("OPENAI_API_BASE")
-    )
+def get_openai_env_vars():
+    """Return the OpenAI environment variables"""
+    return os.getenv("OPENAI_API_KEY"), os.getenv("OPENAI_API_BASE")

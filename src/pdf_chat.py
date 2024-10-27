@@ -1,17 +1,10 @@
 from .environment import init_environment
-from .parsing.pdf_loader import load_pdf_as_query_engine
+from .parsing.llama_parse_pdf import load_pdf_as_query_engine
 from .chat.chat_engine import chat_loop
 
 def chat_with_pdf():
-    pinecone_index = init_environment()
-    
-    # Use default path or get PDF path from user
-    default_path = "pdfs/disclosures.pdf"
-    pdf_path = input(f"Enter the path to your PDF file (press Enter to use {default_path}): ").strip()
-    if not pdf_path:
-        pdf_path = default_path
-        
-    query_engine = load_pdf_as_query_engine(pdf_path, pinecone_index)
+    init_environment()
+    query_engine = load_pdf_as_query_engine()
     chat_loop(query_engine)
 
 if __name__ == "__main__":
