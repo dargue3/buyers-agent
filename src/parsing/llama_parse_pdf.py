@@ -1,10 +1,9 @@
 from ..utils.files import get_file_hash, ask_user_for_file_path
-from ..vector_stores.pinecone import check_file_hash_exists, get_pinecone_vector_store
+from ..vector_stores.pinecone import check_file_hash_exists, get_pinecone
 
 from llama_parse import LlamaParse
 from llama_index.core import (
     Settings,
-    StorageContext,
     VectorStoreIndex, 
     SimpleDirectoryReader,
 )
@@ -13,15 +12,15 @@ parser = LlamaParse(
     result_type="markdown" 
 )
 
-def load_pdf():
+def get_pdf_index():
     pdf_path = ask_user_for_file_path()
 
     file_hash = get_file_hash(pdf_path)
 
+    vector_store, storage_context = get_pinecone()
+
     if check_file_hash_exists(file_hash):
         print("\n=== Found existing vectors in Pinecone, loading index ===")
-        vector_store = get_pinecone_vector_store()
-        storage_context = StorageContext.from_defaults(vector_store=vector_store)
         index = VectorStoreIndex.from_vector_store(
             vector_store=vector_store,
             storage_context=storage_context
@@ -38,11 +37,12 @@ def load_pdf():
         print(f"Number of nodes: {len(index.docstore.docs)}")
         print(f"Embedding model: {Settings.embed_model}")
         print(f"LLM model: {Settings.llm}")
+        print(f"Metadata example: {index.docstore.docs[0].metadata}")
     
     return index
 
 def load_pdf_as_query_engine():
-    return load_pdf().as_query_engine()
+    return get_pdf_index().as_query_engine()
 
 def load_data(pdf_path):
     file_extractor = {".pdf": parser}
