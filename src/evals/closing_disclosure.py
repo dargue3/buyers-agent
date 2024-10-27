@@ -1,6 +1,6 @@
 from autoevals import OpenAIScorer
 from braintrust import Eval, wrap_openai
-from src.environment import get_openai_env_vars, init_environment
+from src.environment import create_openai_scorer, init_environment
 from src.parsing.pdf_loader import load_pdf_as_query_engine
 
 def setup_chat():
@@ -14,7 +14,7 @@ def run_evals():
     Eval(
         "Closing Disclosure",
         scores=[
-            OpenAIScorer(get_openai_env_vars()),
+            create_openai_scorer(OpenAIScorer),
         ],
         task=lambda input: llm.query(input).response,
         data=lambda: [

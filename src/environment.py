@@ -25,6 +25,9 @@ def get_pinecone_index():
     """Get Pinecone index"""
     return Pinecone(api_key=os.getenv("PINECONE_API_KEY")).Index(os.getenv("PINECONE_INDEX_NAME"))
 
-def get_openai_env_vars():
-    """Get environment variables for OpenAI"""
-    return {"api_key": os.getenv("OPENAI_API_KEY"), "base_url": os.getenv("OPENAI_API_BASE")}
+def create_openai_scorer(scorer_class):
+    """Create an OpenAI scorer with environment variables"""
+    return scorer_class(
+        api_key=os.getenv("OPENAI_API_KEY"),
+        base_url=os.getenv("OPENAI_API_BASE")
+    )
