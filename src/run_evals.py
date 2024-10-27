@@ -1,4 +1,4 @@
-from .environment import init_environment
+from src.environment import init_environment
 from .parsing.pdf_loader import get_query_engine_from_pinecone
 from .evals.closing_disclosure import run_evals
 

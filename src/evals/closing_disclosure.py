@@ -1,7 +1,7 @@
 from braintrust import Eval
 from autoevals import AnswerCorrectness
-from ..environment import init_environment
-from ..parsing.pdf_loader import load_pdf_as_query_engine
+from src.environment import init_environment
+from src.parsing.pdf_loader import load_pdf_as_query_engine
 
 def setup_chat():
     pinecone_index = init_environment()
