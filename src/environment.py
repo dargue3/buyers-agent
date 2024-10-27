@@ -16,16 +16,4 @@ def init_environment():
     pc = Pinecone(api_key=os.getenv("PINECONE_API_KEY"))
     index_name = os.getenv("PINECONE_INDEX_NAME")
     
-    # Get or create the Pinecone index
-    if index_name not in pc.list_indexes().names():
-        pc.create_index(
-            name=index_name,
-            spec=pc.PodSpec(
-                environment="gcp-starter",
-                pod_type="starter",
-                metric="cosine",
-                dimension=1536
-            )
-        )
-    
     return pc.Index(index_name)

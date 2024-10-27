@@ -1,6 +1,6 @@
-from environment import init_environment
-from pdf_loader import load_pdf
-from chat_engine import chat_loop
+from .environment import init_environment
+from .parsing.pdf_loader import load_pdf_as_query_engine
+from .chat.chat_engine import chat_loop
 
 def chat_with_pdf():
     pinecone_index = init_environment()
@@ -11,7 +11,7 @@ def chat_with_pdf():
     if not pdf_path:
         pdf_path = default_path
         
-    query_engine = load_pdf(pdf_path, pinecone_index)
+    query_engine = load_pdf_as_query_engine(pdf_path, pinecone_index)
     chat_loop(query_engine)
 
 if __name__ == "__main__":
