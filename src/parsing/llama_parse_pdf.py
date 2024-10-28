@@ -76,8 +76,40 @@ def get_job_results(job_id):
     }
 
     response = requests.request("GET", url, headers=headers)
+    return response.json().get("markdown")
 
-    print(response.json().get("markdown"))
+def load_job_as_query_engine(job_id):
+    """Get or create index for LlamaCloud job results"""
+    file_hash = job_id  # Use job_id as the unique identifier
+    print(f"\nDocument hash/job_id: {file_hash}")
 
+    storage_context, _ = get_pinecone()
 
-get_job_results("49268169-b791-44e5-ae80-c3c8850bfa82")
+    if check_file_hash_exists(file_hash):
+        print("\n=== Found existing vectors in Pinecone, loading index ===")
+        return get_query_engine_by_file_hash(file_hash)
+    
+    print(f"\n=== Loading and indexing new content from job {job_id} ===")
+    
+    # Get markdown content and create Document
+    markdown_content = get_job_results(job_id)
+    document = Document(
+        text=markdown_content,
+        metadata={
+            "file_hash": file_hash,
+            "job_id": job_id,
+            "source": "llama_cloud"
+        }
+    )
+    
+    index = VectorStoreIndex.from_documents(
+        [document],
+        storage_context=storage_context
+    )
+    
+    print(f"\nIndex Stats:")
+    print(f"Number of nodes: {len(index.docstore.docs)}")
+    print(f"Embedding model: {Settings.embed_model}")
+    print(f"LLM model: {Settings.llm}")
+    
+    return index.as_query_engine()
