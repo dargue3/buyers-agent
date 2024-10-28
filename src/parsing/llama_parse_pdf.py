@@ -6,6 +6,7 @@ from llama_index.core import (
     Settings,
     VectorStoreIndex, 
     SimpleDirectoryReader,
+    Document
 )
 
 def get_llama_parser():
@@ -61,3 +62,29 @@ def load_data(pdf_path):
         file_extractor=file_extractor
     )
     return reader.load_data()
+
+def load_data_from_job_id(job_id):
+    """Load parsed results from an existing LlamaCloud job ID"""
+    parser = get_llama_parser()
+    
+    # Fetch results from LlamaCloud
+    results = parser.get_result(job_id)
+    
+    if not results:
+        raise ValueError(f"No results found for job ID: {job_id}")
+        
+    # Convert LlamaParse results to Document objects
+    documents = []
+    for result in results:
+        # Create Document with same structure as SimpleDirectoryReader output
+        doc = Document(
+            text=result.content,
+            metadata={
+                "page_label": result.metadata.get("page_number", ""),
+                "file_name": result.metadata.get("file_name", ""),
+                # Add any other metadata fields you need
+            }
+        )
+        documents.append(doc)
+    
+    return documents
