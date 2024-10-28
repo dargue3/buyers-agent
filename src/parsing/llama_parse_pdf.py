@@ -1,4 +1,6 @@
 import os
+import requests
+from llama_cloud.client import LlamaCloud
 from src.utils.files import get_file_hash, ask_user_for_file_path
 from src.vector_stores.pinecone import check_file_hash_exists, get_pinecone, get_query_engine_by_file_hash
 from llama_parse import LlamaParse
@@ -63,28 +65,19 @@ def load_data(pdf_path):
     )
     return reader.load_data()
 
-def load_data_from_job_id(job_id):
-    """Load parsed results from an existing LlamaCloud job ID"""
-    parser = get_llama_parser()
+def get_job_results(job_id):
+    """Get parsed results from LlamaCloud job ID"""
     
-    # Fetch results from LlamaCloud
-    results = parser.get_result(job_id)
-    
-    if not results:
-        raise ValueError(f"No results found for job ID: {job_id}")
-        
-    # Convert LlamaParse results to Document objects
-    documents = []
-    for result in results:
-        # Create Document with same structure as SimpleDirectoryReader output
-        doc = Document(
-            text=result.content,
-            metadata={
-                "page_label": result.metadata.get("page_number", ""),
-                "file_name": result.metadata.get("file_name", ""),
-                # Add any other metadata fields you need
-            }
-        )
-        documents.append(doc)
-    
-    return documents
+    url = f"https://api.cloud.llamaindex.ai/api/v1/parsing/job/{job_id}/result/markdown"
+
+    headers = {
+        "Accept": "application/json",
+        "Authorization": f"Bearer {os.getenv('LLAMA_CLOUD_API_KEY')}"
+    }
+
+    response = requests.request("GET", url, headers=headers)
+
+    print(response.json().get("markdown"))
+
+
+get_job_results("49268169-b791-44e5-ae80-c3c8850bfa82")
