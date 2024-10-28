@@ -33,13 +33,18 @@ def check_file_hash_exists(file_hash, namespace=DEFAULT_NAMESPACE):
     return len(existing_vectors.matches) > 0
 
 def get_query_engine_by_file_hash(file_hash, namespace=DEFAULT_NAMESPACE):
-    """Get index containing only documents with matching file_hash"""
+    """Get query engine that only searches documents with matching file_hash"""
     storage_context, vector_store = get_pinecone(namespace)
     
-    # Create index from filtered vector store
+    # Create index from vector store
     index = VectorStoreIndex.from_vector_store(
         vector_store=vector_store,
         storage_context=storage_context
     )
     
-    return index.as_query_engine()
+    # Create query engine with metadata filter for file_hash
+    return index.as_query_engine(
+        filters={
+            "file_hash": {"$eq": file_hash}
+        }
+    )
