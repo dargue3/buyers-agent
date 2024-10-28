@@ -16,6 +16,16 @@ def get_pinecone(namespace=DEFAULT_NAMESPACE):
     storage_context = StorageContext.from_defaults(vector_store=vector_store)
     return storage_context, vector_store
 
+def delete_docs_by_file_hash(file_hash, namespace=DEFAULT_NAMESPACE):
+    index = get_pinecone_index()
+    result = index.delete(
+        namespace=namespace,
+        filter={
+            "file_hash": {"$eq": file_hash}
+        }
+    )
+    print(result)
+
 def check_file_hash_exists(file_hash, namespace=DEFAULT_NAMESPACE):
     """Check if document with given hash exists in Pinecone"""
     index = get_pinecone_index()
@@ -25,10 +35,10 @@ def check_file_hash_exists(file_hash, namespace=DEFAULT_NAMESPACE):
         vector=[0] * EMBEDDING_DIM,
         top_k=1,
         namespace=namespace,
+        include_metadata=True,
         filter={
             "file_hash": {"$eq": file_hash}
         },
-        include_metadata=True
     )
     
     return len(existing_vectors.matches) > 0

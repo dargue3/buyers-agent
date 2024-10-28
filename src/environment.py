@@ -1,12 +1,9 @@
 import os
-import warnings
-import urllib3
-warnings.filterwarnings("ignore", category=urllib3.exceptions.NotOpenSSLWarning)
 from dotenv import load_dotenv
+from pinecone import Pinecone
 from llama_index.core import Settings
 from llama_index.embeddings.openai import OpenAIEmbedding
 from llama_index.llms.openai import OpenAI
-from pinecone import Pinecone
 
 load_dotenv()
 
@@ -18,7 +15,7 @@ def init_environment():
 
 def get_default_pdf_path():
     """Get default PDF path"""
-    return "pdfs/connie_home_inspection.pdf"
+    return "pdfs/greer/26 3468 Greer Road - Property Inspection Report [Shawn Cooley].pdf"
 
 def setup_llama_index():
     """Setup Llama Index"""

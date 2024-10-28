@@ -1,6 +1,5 @@
 import os
 import requests
-from llama_cloud.client import LlamaCloud
 from src.utils.files import get_file_hash, ask_user_for_file_path
 from src.vector_stores.pinecone import check_file_hash_exists, get_pinecone, get_query_engine_by_file_hash
 from llama_parse import LlamaParse
@@ -80,14 +79,13 @@ def get_job_results(job_id):
 
 def load_job_as_query_engine(job_id, file_hash):
     """Get or create index for LlamaCloud job results"""
-    file_hash = job_id  # Use job_id as the unique identifier
     print(f"\nDocument hash/job_id: {file_hash}")
 
     storage_context, _ = get_pinecone()
 
     if check_file_hash_exists(file_hash):
-        print("\n=== Found existing vectors in Pinecone, loading index ===")
-        return get_query_engine_by_file_hash(file_hash)
+        print("\n=== Vectors already exist in Pinecone ===")
+        return
     
     print(f"\n=== Loading and indexing new content from job {job_id} ===")
     
@@ -97,16 +95,12 @@ def load_job_as_query_engine(job_id, file_hash):
     
     # Create a Document for each section
     documents = []
-    for i, section in enumerate(sections):
-        if section.strip():  # Only create documents for non-empty sections
+    for section in sections:
+        if section.strip():
             documents.append(Document(
                 text=section.strip(),
                 metadata={
                     "file_hash": file_hash,
-                    "job_id": job_id,
-                    "source": "llama_cloud",
-                    "section": i + 1,
-                    "total_sections": len(sections)
                 }
             ))
     
@@ -121,5 +115,3 @@ def load_job_as_query_engine(job_id, file_hash):
     print(f"LLM model: {Settings.llm}")
     
     return index.as_query_engine()
-
-load_job_as_query_engine("49268169-b791-44e5-ae80-c3c8850bfa82", "a53b0f5c8a32fd24649ac800f8db23e0")
