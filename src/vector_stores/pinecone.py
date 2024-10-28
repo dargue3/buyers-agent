@@ -3,7 +3,7 @@ from llama_index.core import StorageContext
 from llama_index.vector_stores.pinecone import PineconeVectorStore
 
 DEFAULT_NAMESPACE = "disclosures"
-EMBEDDING_DIM = 1536  # OpenAI ada-002 dimension
+EMBEDDING_DIM = 1536
 
 def get_pinecone(namespace=DEFAULT_NAMESPACE):
     """Get Pinecone vector store and storage context"""
