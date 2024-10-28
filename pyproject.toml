@@ -19,6 +19,7 @@ autoevals = "^0.0.99"
 llama-parse = "^0.5.12"
 llama-index-llms-openai = "^0.2.16"
 llama-index-embeddings-openai = "^0.2.5"
+rich = "^13.9.3"
 
 
 [tool.poetry.group.dev.dependencies]

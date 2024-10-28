@@ -1,20 +1,16 @@
+from ..environment import get_openai_env_vars
+from ..parsing.llama_parse_pdf import load_pdf_as_query_engine
+
 from braintrust import Eval
 from autoevals import Factuality
-from src.environment import get_openai_env_vars, init_environment
-from src.parsing.pinecone_pdf_loader import load_pdf_as_query_engine
 
-def setup_chat():
-    pinecone_index = init_environment()
-    query_engine = load_pdf_as_query_engine("pdfs/disclosures.pdf", pinecone_index)
-    return query_engine
-
-llm = setup_chat()
+llm = load_pdf_as_query_engine("pdfs/disclosures.pdf")
 
 api_key, base_url = get_openai_env_vars()
 
 def run_evals():
     Eval(
-        "Closing Disclosure",
+        name="Closing Disclosure",
         scores=[Factuality(api_key=api_key, base_url=base_url)],
         task=lambda input: llm.query(input).response,
         data=lambda: [

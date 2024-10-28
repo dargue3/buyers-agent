@@ -1,6 +1,8 @@
-import hashlib
 import os
+import hashlib
 from pathlib import Path
+
+from src.environment import get_default_pdf_path
 
 def get_project_root():
     """Get the absolute path to the project root directory"""
@@ -17,7 +19,7 @@ def get_file_hash(file_path):
         return hashlib.md5(f.read()).hexdigest()
     
 def ask_user_for_file_path():
-    default_path = "pdfs/disclosures.pdf"
+    default_path = get_default_pdf_path()
     pdf_path = input(f"Enter the path to your PDF file (press Enter to use {default_path}): ").strip()
     if not pdf_path:
         pdf_path = default_path

@@ -1,5 +1,7 @@
 .aider*
 .env
+pdfs/
+
 # Python
 __pycache__/
 *.py[cod]

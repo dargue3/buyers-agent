@@ -1,6 +1,7 @@
 from src.environment import get_pinecone_index
 from llama_index.core import StorageContext, VectorStoreIndex
 from llama_index.vector_stores.pinecone import PineconeVectorStore
+from llama_index.core.vector_stores.types import MetadataFilters, ExactMatchFilter
 
 DEFAULT_NAMESPACE = "disclosures"
 EMBEDDING_DIM = 1536
@@ -41,10 +42,7 @@ def get_query_engine_by_file_hash(file_hash, namespace=DEFAULT_NAMESPACE):
         vector_store=vector_store,
         storage_context=storage_context
     )
+
+    filters = MetadataFilters(filters=[ExactMatchFilter(key="file_hash", value=file_hash)])
     
-    # Create query engine with metadata filter for file_hash
-    return index.as_query_engine(
-        filters={
-            "file_hash": {"$eq": file_hash}
-        }
-    )
+    return index.as_query_engine(filters=filters)
