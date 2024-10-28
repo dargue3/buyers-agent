@@ -91,19 +91,27 @@ def load_job_as_query_engine(job_id, file_hash):
     
     print(f"\n=== Loading and indexing new content from job {job_id} ===")
     
-    # Get markdown content and create Document
+    # Get markdown content and split on horizontal rules
     markdown_content = get_job_results(job_id)
-    document = Document(
-        text=markdown_content,
-        metadata={
-            "file_hash": file_hash,
-            "job_id": job_id,
-            "source": "llama_cloud"
-        }
-    )
+    sections = markdown_content.split('\n---\n')
+    
+    # Create a Document for each section
+    documents = []
+    for i, section in enumerate(sections):
+        if section.strip():  # Only create documents for non-empty sections
+            documents.append(Document(
+                text=section.strip(),
+                metadata={
+                    "file_hash": file_hash,
+                    "job_id": job_id,
+                    "source": "llama_cloud",
+                    "section": i + 1,
+                    "total_sections": len(sections)
+                }
+            ))
     
     index = VectorStoreIndex.from_documents(
-        [document],
+        documents,
         storage_context=storage_context
     )
     
