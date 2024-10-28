@@ -1,7 +1,6 @@
 from pathlib import Path
-from llama_index import VectorStoreIndex
-from llama_index.storage.storage_context import StorageContext
-from llama_index.vector_stores import SimpleVectorStore
+from llama_index.core import StorageContext, VectorStoreIndex
+from llama_index.core.vector_stores import SimpleVectorStore
 from ..utils.files import get_project_root
 
 DEFAULT_VECTOR_DIR = "vector_stores"
