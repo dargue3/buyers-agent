@@ -6,7 +6,7 @@ authors = ["Your Name <you@example.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "3.9.6"
+python = "3.9.20"
 llama-index = "^0.11.20"
 langchain = "^0.3.4"
 langchain-community = "^0.3.3"
@@ -21,6 +21,7 @@ llama-index-llms-openai = "^0.2.16"
 llama-index-embeddings-openai = "^0.2.5"
 rich = "^13.9.3"
 urllib3 = "1.26.15"
+llama-index-readers-web = "^0.2.4"
 
 
 [tool.poetry.group.dev.dependencies]
