@@ -7,7 +7,8 @@ DEFAULT_VECTOR_DIR = "vector_stores"
 
 def get_storage_path(namespace: str = "default") -> Path:
     """Get the storage directory path for vector stores"""
-    vector_dir = get_project_root() / DEFAULT_VECTOR_DIR / namespace
+    root_path = Path(get_project_root())
+    vector_dir = root_path / DEFAULT_VECTOR_DIR / namespace
     vector_dir.mkdir(parents=True, exist_ok=True)
     return vector_dir
 
