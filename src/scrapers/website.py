@@ -4,10 +4,6 @@ from playwright.sync_api import sync_playwright
 from bs4 import BeautifulSoup
 from src.vector_stores.local_storage import save_vector_store, load_vector_store
 from typing import List, Optional
-import logging
-
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
 
 def extract_content(html: str) -> str:
     """Extract relevant content from HTML, focusing on body and script tags"""
@@ -21,21 +17,16 @@ def extract_content(html: str) -> str:
     body = soup.find('body')
     body_text = body.get_text(separator=' ', strip=True) if body else ''
     
-    # Get script content (might contain important JS data)
-    scripts = soup.find_all('script')
-    script_text = ' '.join(script.string for script in scripts if script.string)
-    
-    return f"{body_text}\n\nEmbedded Scripts:\n{script_text}"
+    return body_text
 
 def scrape_page(url: str, wait_for_selector: Optional[str] = None) -> str:
     """Scrape a single page using Playwright"""
     with sync_playwright() as pw:
-        browser = pw.chromium.launch(headless=True)  # Set to True for production
+        browser = pw.chromium.launch(headless=False)  # Set to True for production
         try:
             context = browser.new_context(viewport={"width": 1920, "height": 1080})
             page = context.new_page()
             
-            logger.info(f"Navigating to {url}")
             page.goto(url, wait_until="networkidle")
             
             if wait_for_selector:
@@ -71,12 +62,9 @@ def scrape_and_index_site(base_url: str, namespace: str = "website_docs",
             content = scrape_page(url, wait_for_selector)
             doc = Document(text=content, metadata={"source": url})
             documents.append(doc)
-            logger.info(f"Successfully scraped {url}")
         except Exception as e:
-            logger.error(f"Error scraping {url}: {str(e)}")
-    
-    logger.info(f"Scraped {len(documents)} documents")
-    
+            print(f"Error scraping {url}: {e}")
+
     index = VectorStoreIndex.from_documents(documents)
     save_vector_store(index, namespace=namespace)
     
