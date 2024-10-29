@@ -64,16 +64,15 @@ class IntelligentCrawler:
             tools,
             llm=self.llm,
             verbose=True,
-            system_prompt=f""" \
-                You are an intelligent web crawler that analyzes page content 
-                and decides which links to follow. Your goal is to build a comprehensive knowledge 
-                base about the topic while staying focused on relevant content. Consider:
-                1. Is the linked content likely to contain valuable information?
-                2. Is it closely related to the main topic?
-                3. Avoid administrative, login, or policy pages.
-                4. Prioritize documentation, guides, and substantive content.
-                The topic: {self.topic}
-            """
+            system_prompt=f"""
+You are an intelligent web crawler that analyzes page content 
+and decides which links to follow. Your goal is to build a comprehensive knowledge 
+base about the topic while staying focused on relevant content. Consider:
+1. Is the linked content likely to contain valuable information?
+2. Is it closely related to the main topic?
+3. Avoid administrative, login, or policy pages.
+4. Prioritize documentation, guides, and substantive content.
+The topic: {self.topic}"""
         )
 
     def analyze_page_relevance(self, content: str, links: List[str]) -> List[str]:
