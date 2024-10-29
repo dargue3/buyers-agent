@@ -98,7 +98,7 @@ class IntelligentCrawler:
         analysis_prompt_template = PromptTemplate(""" \ 
             Based on the following page content and list of links, determine which links 
             are most relevant to follow for building a knowledge base. Return only the indices 
-            of relevant links, separated by commas.
+            of relevant links, separated by commas with no spaces in between.
 
             Content snippet: {content_snippet}...
 
@@ -115,6 +115,8 @@ class IntelligentCrawler:
         )
 
         response = self.llm.complete(prompt)
+
+        logger.info(f"Agent response: {response.text}")
 
         try:
             selected_indices = [int(i.strip()) for i in response.text.split(',')]
