@@ -1,4 +1,7 @@
+import logging
 from src.chat.chat_engine import chat_loop
+
+logger = logging.getLogger(__name__)
 from llama_index.core import VectorStoreIndex, Document
 from playwright.sync_api import sync_playwright
 from bs4 import BeautifulSoup
@@ -32,6 +35,7 @@ def extract_content(html: str) -> str:
 
 def scrape_page(url: str, wait_for_selector: Optional[str] = None) -> str:
     """Scrape a single page using Playwright"""
+    logger.debug(f"Scraping page: {url}")
     with sync_playwright() as pw:
         browser = pw.chromium.launch(headless=False)  # Set to True for production
         try:
@@ -64,6 +68,7 @@ def scrape_and_index_site(base_url: str, namespace: str = "website_docs",
     if additional_urls:
         urls.extend(additional_urls)
     
+    logger.debug(f"Starting scrape of {len(urls)} URLs with namespace: {namespace}")
     documents = []
     for url in urls:
         try:
@@ -71,7 +76,7 @@ def scrape_and_index_site(base_url: str, namespace: str = "website_docs",
             doc = Document(text=content, metadata={"source": url})
             documents.append(doc)
         except Exception as e:
-            print(f"Error scraping {url}: {e}")
+            logger.error(f"Error scraping {url}: {e}")
 
     index = VectorStoreIndex.from_documents(documents)
     save_vector_store(index, namespace=namespace)

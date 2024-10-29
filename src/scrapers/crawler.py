@@ -9,7 +9,11 @@ import logging
 from src.environment import get_open_ai_model
 from src.scrapers.website import scrape_page, scrape_and_index_site
 
-logging.basicConfig(level=logging.INFO)
+# Set up detailed logging
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
 logger = logging.getLogger(__name__)
 
 def extract_links(html_content: str, base_url: str) -> List[str]:
@@ -132,7 +136,7 @@ class IntelligentCrawler:
                 continue
                 
             try:
-                logger.info(f"Crawling: {current_url}")
+                logger.debug(f"Starting crawl of URL: {current_url}")
                 content = scrape_page(current_url)
                 self.visited_urls.add(current_url)
                 
@@ -145,9 +149,10 @@ class IntelligentCrawler:
                 relevant_links = self.analyze_page_relevance(content, domain_links)
                 
                 # Add new relevant links to visit
-                urls_to_visit.extend([
-                    url for url in relevant_links if url not in self.visited_urls
-                ])
+                new_urls = [url for url in relevant_links if url not in self.visited_urls]
+                urls_to_visit.extend(new_urls)
+                logger.debug(f"Found {len(domain_links)} total links, {len(relevant_links)} relevant, {len(new_urls)} new to visit")
+                logger.debug(f"Queue size: {len(urls_to_visit)} URLs")
                 
             except Exception as e:
                 logger.error(f"Error processing {current_url}: {e}")
