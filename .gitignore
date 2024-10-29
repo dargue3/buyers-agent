@@ -1,6 +1,7 @@
 .aider*
 .env
 pdfs/
+vector_stores/
 
 # Python
 __pycache__/
