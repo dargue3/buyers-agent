@@ -12,7 +12,12 @@ def scrape_and_index_site(base_url: str, namespace: str = "website_docs"):
     firecrawl_reader = FireCrawlWebReader(
         mode="crawl",
         api_key=os.getenv("FIRECRAWL_API_KEY"),
-        params={"maxDepth": 1, "allowBackwardLinks": True},
+        params={
+            "maxDepth": 3,  # Increase depth to crawl deeper
+            "allowBackwardLinks": True,
+            "includePaths": ["/hc/en-us/*"],  # Focus on help center paths
+            "limit": 100  # Limit total pages to avoid too many requests
+        }
     )
 
     documents = firecrawl_reader.load_data(url=base_url)
