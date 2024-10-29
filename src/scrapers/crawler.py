@@ -92,25 +92,45 @@ class IntelligentCrawler:
         Analyze page content and links to determine which links to follow.
         Returns a list of relevant URLs to crawl next.
         """
-        # Create formatted list of links
-        link_list = "\n".join([f"{i}: {link}" for i, link in enumerate(links)])
+        # First clean the content using BeautifulSoup
+        soup = BeautifulSoup(content, 'html.parser')
+        cleaned_content = soup.get_text(separator=' ', strip=True)
         
-        analysis_prompt_template = PromptTemplate(""" \ 
-            Based on the following page content and list of links, determine which links 
-            are most relevant to follow for building a knowledge base. Return only the indices 
-            of relevant links, separated by commas with no spaces in between.
-
-            Content snippet: {content_snippet}...
-
-            Available links:
+        # Create formatted list of links with their visible text where possible
+        link_entries = []
+        for i, link in enumerate(links):
+            # Try to find the link in the original HTML to get its text
+            link_tag = soup.find('a', href=lambda x: x and link.endswith(x))
+            link_text = link_tag.get_text(strip=True) if link_tag else "No description"
+            link_entries.append(f"{i}: [{link_text}] {link}")
+        
+        link_list = "\n".join(link_entries)
+        
+        analysis_prompt_template = PromptTemplate(""" \
+            You are analyzing a webpage about {topic} to decide which links to follow next.
+            
+            Current page content summary:
+            {content_snippet}
+            
+            Available links (format: [link text] URL):
             {link_list}
-
-            Return format example: 0,2,5 for selecting links at indices 0, 2, and 5
+            
+            Instructions:
+            1. Choose links that seem most relevant to learning about {topic}
+            2. Prefer links to documentation, guides, and detailed content
+            3. Avoid links to login pages, policies, or administrative sections
+            4. Select 3-5 most promising links
+            
+            Return ONLY the indices of chosen links, comma-separated without spaces.
+            Example return format: 0,2,5
+            
+            Your selection:
             """
         )
         
         prompt = analysis_prompt_template.format(
-            content_snippet=content[:1000],
+            topic=self.topic,
+            content_snippet=cleaned_content[:500],  # Use less content but cleaned
             link_list=link_list
         )
 
@@ -153,8 +173,13 @@ class IntelligentCrawler:
                 # Add new relevant links to visit
                 new_urls = [url for url in relevant_links if url not in self.visited_urls]
                 urls_to_visit.extend(new_urls)
-                logger.debug(f"Found {len(domain_links)} total links, {len(relevant_links)} relevant, {len(new_urls)} new to visit")
-                logger.debug(f"Queue size: {len(urls_to_visit)} URLs")
+                
+                logger.info(f"Page analysis for {current_url}:")
+                logger.info(f"- Found {len(domain_links)} total links")
+                logger.info(f"- Selected {len(relevant_links)} relevant links: {relevant_links}")
+                logger.info(f"- Added {len(new_urls)} new URLs to queue: {new_urls}")
+                logger.info(f"- Current queue size: {len(urls_to_visit)}")
+                logger.info(f"- Visited {len(self.visited_urls)} pages so far")
                 
             except Exception as e:
                 logger.error(f"Error processing {current_url}: {e}")
