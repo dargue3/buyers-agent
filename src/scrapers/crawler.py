@@ -36,7 +36,6 @@ class IntelligentCrawler:
             self,
             topic: str,
             base_url: str,
-            max_pages: int = 20,
             namespace: str = "intelligent_crawl",
         ):
         if not base_url:
@@ -44,11 +43,13 @@ class IntelligentCrawler:
         if not topic:
             raise ValueError("Please provide a topic for the intelligent crawler prompt.")
         
+        self.topic = topic
+        self.max_pages = 50
         self.base_url = base_url
         self.namespace = namespace
-        self.max_pages = max_pages
+        self.llm = get_open_ai_model()
         self.visited_urls: Set[str] = set()
-        self.llm = OpenAI(model=get_open_ai_model())
+        
         self.setup_agent()
 
     def setup_agent(self):
@@ -61,15 +62,18 @@ class IntelligentCrawler:
             )
         ]
 
-        system_prompt_template = PromptTemplate(
-            """You are an intelligent web crawler that analyzes page content 
+        system_prompt_template = PromptTemplate(""" \
+            You are an intelligent web crawler that analyzes page content 
             and decides which links to follow. Your goal is to build a comprehensive knowledge 
-            base about the topic while staying focused on relevant content. Consider:
+            base about the topic while staying focused on relevant content.
+            You're collecting information to help users understand the topic better.
+            Consider:
             1. Is the linked content likely to contain valuable information?
-            2. Is it closely related to the main topic?
+            2. Is it related to the main topic?
             3. Avoid administrative, login, or policy pages.
             4. Prioritize documentation, guides, and substantive content.
-            The topic: {topic}"""
+            The user's topic: {topic}
+            """
         )
         
         self.agent = ReActAgent.from_tools(
@@ -87,8 +91,8 @@ class IntelligentCrawler:
         # Create formatted list of links
         link_list = "\n".join([f"{i}: {link}" for i, link in enumerate(links)])
         
-        analysis_prompt_template = PromptTemplate(
-            """Based on the following page content and list of links, determine which links 
+        analysis_prompt_template = PromptTemplate(""" \ 
+            Based on the following page content and list of links, determine which links 
             are most relevant to follow for building a knowledge base. Return only the indices 
             of relevant links, separated by commas.
 
@@ -97,15 +101,17 @@ class IntelligentCrawler:
             Available links:
             {link_list}
 
-            Return format example: 0,2,5 for selecting links at indices 0, 2, and 5"""
+            Return format example: 0,2,5 for selecting links at indices 0, 2, and 5
+            """
         )
         
         prompt = analysis_prompt_template.format(
             content_snippet=content[:1000],
             link_list=link_list
         )
-        
+
         response = self.llm.complete(prompt)
+
         try:
             selected_indices = [int(i.strip()) for i in response.text.split(',')]
             return [links[i] for i in selected_indices if i < len(links)]
@@ -140,8 +146,7 @@ class IntelligentCrawler:
                 
                 # Add new relevant links to visit
                 urls_to_visit.extend([
-                    url for url in relevant_links 
-                    if url not in self.visited_urls
+                    url for url in relevant_links if url not in self.visited_urls
                 ])
                 
             except Exception as e:
@@ -159,7 +164,7 @@ def intelligent_crawl_and_chat(base_url: str, topic: str, namespace: str = "scra
     """
     Convenience function to crawl a site intelligently and start chatting.
     """
-    crawler = IntelligentCrawler(base_url=base_url, namespace=namespace, topic=topic)
+    crawler = IntelligentCrawler(base_url=base_url, topic=topic, namespace=namespace)
     crawler.crawl()
     # Start chat with the indexed content
     from src.scrapers.website import chat_with_saved_site
@@ -168,4 +173,4 @@ def intelligent_crawl_and_chat(base_url: str, topic: str, namespace: str = "scra
 if __name__ == "__main__":
     # Example usage
     TEST_URL = "https://help.docebo.com/hc/en-us/sections/4407577387026-Docebo-Flow"
-    intelligent_crawl_and_chat(TEST_URL, max_pages=5)
+    intelligent_crawl_and_chat(TEST_URL, topic="How much effort is required to implement Docebo on my own website?")

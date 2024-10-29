@@ -68,7 +68,6 @@ def scrape_and_index_site(base_url: str, namespace: str = "website_docs",
     for url in urls:
         try:
             content = scrape_page(url, wait_for_selector)
-            print(content)
             doc = Document(text=content, metadata={"source": url})
             documents.append(doc)
         except Exception as e:
