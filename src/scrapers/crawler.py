@@ -80,18 +80,16 @@ The topic: {self.topic}"""
         Analyze page content and links to determine which links to follow.
         Returns a list of relevant URLs to crawl next.
         """
-        prompt = f"""
-        Based on the following page content and list of links, determine which links 
-        are most relevant to follow for building a knowledge base. Return only the indices 
-        of relevant links, separated by commas.
-        
-        Content snippet: {content[:1000]}...
-        
-        Available links:
-        {[f"{i}: {link}\n" for i, link in enumerate(links)]}
-        
-        Return format example: 0,2,5 for selecting links at indices 0, 2, and 5
-        """
+        prompt = f"""Based on the following page content and list of links, determine which links 
+are most relevant to follow for building a knowledge base. Return only the indices 
+of relevant links, separated by commas.
+
+Content snippet: {content[:1000]}...
+
+Available links:
+{[f"{i}: {link}\n" for i, link in enumerate(links)]}
+
+Return format example: 0,2,5 for selecting links at indices 0, 2, and 5"""
         
         response = self.llm.complete(prompt)
         try:
