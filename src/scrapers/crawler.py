@@ -3,6 +3,7 @@ from urllib.parse import urljoin, urlparse
 from llama_index.core.agent import ReActAgent
 from llama_index.core.tools import FunctionTool
 from llama_index.llms.openai import OpenAI
+from llama_index.core.prompts import PromptTemplate
 from bs4 import BeautifulSoup
 import logging
 from src.environment import get_open_ai_model
@@ -64,15 +65,16 @@ class IntelligentCrawler:
             tools,
             llm=self.llm,
             verbose=True,
-            system_prompt=f"""
-You are an intelligent web crawler that analyzes page content 
+            system_prompt=PromptTemplate(
+                """You are an intelligent web crawler that analyzes page content 
 and decides which links to follow. Your goal is to build a comprehensive knowledge 
 base about the topic while staying focused on relevant content. Consider:
 1. Is the linked content likely to contain valuable information?
 2. Is it closely related to the main topic?
 3. Avoid administrative, login, or policy pages.
 4. Prioritize documentation, guides, and substantive content.
-The topic: {self.topic}"""
+The topic: {topic}"""
+            ).format(topic=self.topic)
         )
 
     def analyze_page_relevance(self, content: str, links: List[str]) -> List[str]:
@@ -80,16 +82,26 @@ The topic: {self.topic}"""
         Analyze page content and links to determine which links to follow.
         Returns a list of relevant URLs to crawl next.
         """
-        prompt = f"""Based on the following page content and list of links, determine which links 
+        # Create formatted list of links
+        link_list = "\n".join([f"{i}: {link}" for i, link in enumerate(links)])
+        
+        analysis_prompt = PromptTemplate(
+            """Based on the following page content and list of links, determine which links 
 are most relevant to follow for building a knowledge base. Return only the indices 
 of relevant links, separated by commas.
 
-Content snippet: {content[:1000]}...
+Content snippet: {content_snippet}...
 
 Available links:
-{[f"{i}: {link}\n" for i, link in enumerate(links)]}
+{link_list}
 
 Return format example: 0,2,5 for selecting links at indices 0, 2, and 5"""
+        )
+        
+        prompt = analysis_prompt.format(
+            content_snippet=content[:1000],
+            link_list=link_list
+        )
         
         response = self.llm.complete(prompt)
         try:
