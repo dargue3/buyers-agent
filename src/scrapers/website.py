@@ -6,18 +6,29 @@ from src.vector_stores.local_storage import save_vector_store, load_vector_store
 from typing import List, Optional
 
 def extract_content(html: str) -> str:
-    """Extract relevant content from HTML, focusing on body and script tags"""
+    """Extract relevant content from HTML, preserving links and main content"""
     soup = BeautifulSoup(html, 'html.parser')
     
     # Remove unwanted elements
-    for element in soup.find_all(['nav', 'footer', 'header', 'style', 'meta', 'link']):
+    for element in soup.find_all(['nav', 'footer', 'header', 'style', 'meta']):
         element.decompose()
     
-    # Get body content
+    # Get body content while preserving links
     body = soup.find('body')
-    body_text = body.get_text(separator=' ', strip=True) if body else ''
+    if not body:
+        return ''
     
-    return body_text
+    # Replace links with their text and URL in parentheses
+    for a_tag in body.find_all('a'):
+        href = a_tag.get('href', '')
+        if href and not href.startswith('#'):  # Skip anchor links
+            if not href.startswith(('http://', 'https://')):
+                # Make relative URLs absolute
+                href = f"https://{href}" if href.startswith('//') else href
+            # Preserve link text with URL
+            a_tag.replace_with(f"{a_tag.get_text()} ({href})")
+    
+    return body.get_text(separator=' ', strip=True)
 
 def scrape_page(url: str, wait_for_selector: Optional[str] = None) -> str:
     """Scrape a single page using Playwright"""
