@@ -17,7 +17,6 @@ def get_llama_parser():
         raise ValueError("LLAMA_CLOUD_API_KEY environment variable not set")
     return LlamaParse(
         api_key=api_key,
-        premium_mode=True,
         result_type="markdown"
     )
 

@@ -22,6 +22,7 @@ llama-index-embeddings-openai = "^0.2.5"
 rich = "^13.9.3"
 urllib3 = "1.26.15"
 llama-index-readers-web = "^0.2.4"
+firecrawl-py = "^1.4.0"
 
 
 [tool.poetry.group.dev.dependencies]

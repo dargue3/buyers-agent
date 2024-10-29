@@ -1,4 +1,4 @@
-from typing import List, Set, Optional
+from typing import List, Set
 from urllib.parse import urljoin, urlparse
 from llama_index.core.agent import ReActAgent
 from llama_index.core.tools import FunctionTool
@@ -31,8 +31,18 @@ def is_same_domain(url1: str, url2: str) -> bool:
     return domain1 == domain2
 
 class IntelligentCrawler:
-    def __init__(self, base_url: str, namespace: str = "intelligent_crawl",
-                 max_pages: int = 10):
+    def __init__(
+            self,
+            topic: str,
+            base_url: str,
+            max_pages: int = 20,
+            namespace: str = "intelligent_crawl",
+        ):
+        if not base_url:
+            raise ValueError("Please provide a base URL to start crawling.")
+        if not topic:
+            raise ValueError("Please provide a topic for the intelligent crawler prompt.")
+        
         self.base_url = base_url
         self.namespace = namespace
         self.max_pages = max_pages
@@ -54,13 +64,16 @@ class IntelligentCrawler:
             tools,
             llm=self.llm,
             verbose=True,
-            system_prompt="""You are an intelligent web crawler that analyzes page content 
-            and decides which links to follow. Your goal is to build a comprehensive knowledge 
-            base about the topic while staying focused on relevant content. Consider:
-            1. Is the linked content likely to contain valuable information?
-            2. Is it closely related to the main topic?
-            3. Avoid administrative, login, or policy pages.
-            4. Prioritize documentation, guides, and substantive content."""
+            system_prompt=f""" \
+                You are an intelligent web crawler that analyzes page content 
+                and decides which links to follow. Your goal is to build a comprehensive knowledge 
+                base about the topic while staying focused on relevant content. Consider:
+                1. Is the linked content likely to contain valuable information?
+                2. Is it closely related to the main topic?
+                3. Avoid administrative, login, or policy pages.
+                4. Prioritize documentation, guides, and substantive content.
+                The topic: {self.topic}
+            """
         )
 
     def analyze_page_relevance(self, content: str, links: List[str]) -> List[str]:
@@ -76,9 +89,9 @@ class IntelligentCrawler:
         Content snippet: {content[:1000]}...
         
         Available links:
-        {[f"{i}: {link}" for i, link in enumerate(links)]}
+        {[f"{i}: {link}\n" for i, link in enumerate(links)]}
         
-        Return format example: "0,2,5" for selecting links at indices 0, 2, and 5
+        Return format example: 0,2,5 for selecting links at indices 0, 2, and 5
         """
         
         response = self.llm.complete(prompt)
@@ -131,15 +144,11 @@ class IntelligentCrawler:
             additional_urls=list(self.visited_urls)[1:],  # Skip base_url as it's handled by default
         )
 
-def intelligent_crawl_and_chat(
-    base_url: str,
-    namespace: str = "intelligent_crawl",
-    max_pages: int = 10
-) -> None:
+def intelligent_crawl_and_chat(base_url: str, topic: str, namespace: str = "scrapers") -> None:
     """
     Convenience function to crawl a site intelligently and start chatting.
     """
-    crawler = IntelligentCrawler(base_url, namespace, max_pages)
+    crawler = IntelligentCrawler(base_url=base_url, namespace=namespace, topic=topic)
     crawler.crawl()
     # Start chat with the indexed content
     from src.scrapers.website import chat_with_saved_site
