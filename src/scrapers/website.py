@@ -29,7 +29,7 @@ def extract_content(html: str) -> str:
                 # Make relative URLs absolute
                 href = f"https://{href}" if href.startswith('//') else href
             # Preserve link text with URL
-            a_tag.replace_with(f"{a_tag.get_text()} ({href})")
+            a_tag.replace_with(f"[{a_tag.get_text()}]({href})")
     
     return body.get_text(separator=' ', strip=True)
 

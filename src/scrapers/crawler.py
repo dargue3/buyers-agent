@@ -11,7 +11,7 @@ from src.scrapers.website import scrape_page, scrape_and_index_site
 
 # Set up detailed logging
 logging.basicConfig(
-    level=logging.DEBUG,
+    level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger(__name__)
@@ -123,6 +123,9 @@ class IntelligentCrawler:
             
             Return ONLY the indices of chosen links, comma-separated without spaces.
             Example return format: 0,2,5
+                                                  
+            In the event of the page content seeming to indicate that we are logged out or otherwise
+            unable to access any content on this screen, please reply only with SKIP to skip this page.
             
             Your selection:
             """
