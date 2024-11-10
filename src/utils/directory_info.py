@@ -5,12 +5,13 @@ import sys
 import hashlib
 from typing import List, Tuple
 
-def generate_file_id(filename: str) -> str:
+def generate_file_id(name: str, extension: str, size_mb: float) -> str:
     """
-    Generate a short, deterministic ID from filename.
-    Returns first 6 characters of SHA-1 hash.
+    Generate a short, deterministic ID from file information.
+    Returns first 6 characters of SHA-1 hash of name, extension and size.
     """
-    return hashlib.sha1(filename.encode()).hexdigest()[:6]
+    file_info = f"{name}{extension}{size_mb:.1f}".encode()
+    return hashlib.sha1(file_info).hexdigest()[:6]
 
 def get_directory_info(directory_path: str) -> List[Tuple[str, str, str, str]]:
     """
@@ -37,7 +38,7 @@ def get_directory_info(directory_path: str) -> List[Tuple[str, str, str, str]]:
             name = file_path.name
             extension = file_path.suffix if file_path.suffix else "(no ext)"
             size_mb = os.path.getsize(file_path) / (1024 * 1024)  # Convert to MB
-            file_id = generate_file_id(name)
+            file_id = generate_file_id(name, extension, size_mb)
             file_info.append((file_id, name, extension, f"{size_mb:.1f}MB"))
             
     return file_info
