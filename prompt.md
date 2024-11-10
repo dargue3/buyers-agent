@@ -1,10 +1,3 @@
-Variables:
-
-{'$PDF'}
-
----
-
-Prompt:
 You are tasked with analyzing a home inspection report from a real estate disclosure package. Your
 goal is to identify and enumerate the issues found in the home, with a focus on problems that
 require immediate attention or are notably expensive and difficult to fix. This information is
@@ -13,7 +6,7 @@ crucial for potential homebuyers to make informed decisions.
 Here is the content of the PDF home inspection report:
 
 <pdf_content>
-{$PDF}
+The PDF content is provided as an attached document.
 </pdf_content>
 
 Please follow these steps to analyze the report:
