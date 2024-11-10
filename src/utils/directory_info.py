@@ -1,6 +1,5 @@
 from pathlib import Path
 import os
-from datetime import datetime
 import csv
 import sys
 from typing import List
@@ -30,7 +29,7 @@ def get_directory_info(directory_path: str) -> List[tuple]:
             name = file_path.name
             extension = file_path.suffix if file_path.suffix else "(no ext)"
             size_mb = os.path.getsize(file_path) / (1024 * 1024)  # Convert to MB
-            file_info.append((name, extension, f"{size_mb:.2f}"))
+            file_info.append((name, extension, f"{size_mb:.1f}MB"))
             
     return file_info
 
