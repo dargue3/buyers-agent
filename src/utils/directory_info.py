@@ -4,13 +4,10 @@ from datetime import datetime
 import csv
 import sys
 
-# Files to ignore
-IGNORED_FILES = {'.DS_Store', '.gitignore', '__pycache__', '.git'}
-
 def print_directory_info(directory_path: str) -> None:
     """
     Print information about files in the given directory in CSV format.
-    Sizes are in MB and system files are ignored.
+    Sizes are in MB and dotfiles are ignored.
     
     Args:
         directory_path (str): Path to the directory to analyze
@@ -22,8 +19,8 @@ def print_directory_info(directory_path: str) -> None:
         print(f"Error: {directory_path} is not a valid directory")
         return
 
-    # Get only files in the current directory (no recursion)
-    files = [f for f in dir_path.iterdir() if f.name not in IGNORED_FILES]
+    # Get only files in the current directory (no recursion), excluding dotfiles
+    files = [f for f in dir_path.iterdir() if not f.name.startswith('.')]
     
     # Print header as CSV
     writer = csv.writer(sys.stdout)
