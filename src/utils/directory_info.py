@@ -3,8 +3,30 @@ import os
 from datetime import datetime
 import csv
 import sys
+from typing import List
 
-def print_directory_info(directory_path: str) -> None:
+def print_directory_info(files: List[str]) -> None:
+    """
+    Print information about files in the given directory.
+    
+    Args:
+        files (List[str]): List of filenames to analyze
+    """
+    # Print header
+    print("Filename\tExtension\tSize (MB)")
+    print()  # Empty line for spacing
+    
+    # Print info for each file
+    for file in files:
+        # Get file information
+        name = Path(file).name
+        extension = Path(file).suffix if Path(file).suffix else "(no ext)"
+        size_mb = os.path.getsize(file) / (1024 * 1024)  # Convert to MB
+        
+        # Print info as tab-separated values
+        print(f"{name}\t{extension}\t{size_mb:.2f}")
+
+def collect_directory_info(directory_path: str) -> None:
     """
     Print information about files in the given directory in CSV format.
     Sizes are in MB and dotfiles are ignored.
@@ -24,7 +46,7 @@ def print_directory_info(directory_path: str) -> None:
     
     # Print header as CSV
     writer = csv.writer(sys.stdout)
-    writer.writerow(['Filename', 'Extension', 'Size (MB)', 'Last Modified'])
+    writer.writerow(['Filename', 'Extension', 'Size (MB)'])
     writer.writerow([])  # Empty row for spacing
     
     # Print info for each file
@@ -34,11 +56,9 @@ def print_directory_info(directory_path: str) -> None:
             name = file_path.name
             extension = file_path.suffix if file_path.suffix else "(no ext)"
             size_mb = os.path.getsize(file_path) / (1024 * 1024)  # Convert to MB
-            mod_time = datetime.fromtimestamp(os.path.getmtime(file_path))
-            mod_time_str = mod_time.strftime("%Y-%m-%d %H:%M:%S")
             
             # Write CSV row
-            writer.writerow([name, extension, f"{size_mb:.2f}", mod_time_str])
+            writer.writerow([name, extension, f"{size_mb:.2f}"])
             writer.writerow([])  # Empty row for spacing
 
 if __name__ == "__main__":
@@ -50,4 +70,4 @@ if __name__ == "__main__":
     else:
         directory = "."  # Current directory if no argument provided
         
-    print_directory_info(directory)
+    collect_directory_info(directory)
