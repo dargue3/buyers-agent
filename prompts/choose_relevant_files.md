@@ -35,3 +35,8 @@ After analyzing all files, provide your final selection of important files to be
 </important_files>
 
 Remember to consider alternative names for the important file types and use your best judgment to identify files that are likely to contain crucial information for the real estate disclosure package.
+
+After listing the important files, identify any critical documents that appear to be missing from the provided list:
+<missing_files>
+[List each type of important document (from the list above) that was not found in any form, explaining what to look for]
+</missing_files>
