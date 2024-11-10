@@ -45,7 +45,13 @@ def analyze_pdf_with_claude(pdf_path=None):
         ],
     )
 
-    return message.content
+    # Extract the text content from the message
+    text_content = ""
+    for content in message.content:
+        if isinstance(content, dict) and content.get("type") == "text":
+            text_content += content.get("text", "")
+    
+    return text_content
 
 if __name__ == "__main__":
     response = analyze_pdf_with_claude()
