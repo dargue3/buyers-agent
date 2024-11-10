@@ -7,11 +7,11 @@ from src.utils.directory_info import get_directory_info
 from src.environment import get_open_ai_model
 from src.utils.files import resolve_path
 
-def format_files_as_csv(file_info: List[tuple]) -> str:
+def format_files_as_csv(file_info: List[Tuple[str, str, str, str]]) -> str:
     """Convert file info tuples to CSV string format."""
     csv_lines = []
-    for name, ext, size in file_info:
-        csv_lines.append(f"{name},{ext},{size}")
+    for file_id, name, ext, size in file_info:
+        csv_lines.append(f"{file_id},{name},{ext},{size}")
     return "\n".join(csv_lines)
 
 def analyze_directory(directory_path: str) -> str:

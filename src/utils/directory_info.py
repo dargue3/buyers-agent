@@ -2,9 +2,17 @@ from pathlib import Path
 import os
 import csv
 import sys
-from typing import List
+import hashlib
+from typing import List, Tuple
 
-def get_directory_info(directory_path: str) -> List[tuple]:
+def generate_file_id(filename: str) -> str:
+    """
+    Generate a short, deterministic ID from filename.
+    Returns first 6 characters of SHA-1 hash.
+    """
+    return hashlib.sha1(filename.encode()).hexdigest()[:6]
+
+def get_directory_info(directory_path: str) -> List[Tuple[str, str, str, str]]:
     """
     Collect information about files in the given directory.
     
@@ -29,7 +37,8 @@ def get_directory_info(directory_path: str) -> List[tuple]:
             name = file_path.name
             extension = file_path.suffix if file_path.suffix else "(no ext)"
             size_mb = os.path.getsize(file_path) / (1024 * 1024)  # Convert to MB
-            file_info.append((name, extension, f"{size_mb:.1f}MB"))
+            file_id = generate_file_id(name)
+            file_info.append((file_id, name, extension, f"{size_mb:.1f}MB"))
             
     return file_info
 
@@ -41,7 +50,7 @@ def print_directory_info(file_info: List[tuple]) -> None:
         file_info (List[tuple]): List of (filename, extension, size_mb) tuples
     """
     writer = csv.writer(sys.stdout)
-    writer.writerow(['Filename', 'Extension', 'Size (MB)'])
+    writer.writerow(['ID', 'Filename', 'Extension', 'Size (MB)'])
     writer.writerow([])  # Empty row for spacing
     
     for info in file_info:

@@ -7,7 +7,9 @@ The following file types are particularly important, but may be named differentl
 3. Natural hazard report
 
 You will be provided with a list of files in CSV format. Each line represents a file with the following information:
-filename,extension,fileSize
+fileId,filename,extension,fileSize
+
+The fileId is a unique identifier you MUST use when referring to files in your response.
 
 Here's the list of files to analyze:
 <file_list>
@@ -22,13 +24,14 @@ Analyze each file in the list and determine its importance based on the followin
 
 For each file that you believe is important and worth parsing, provide your reasoning in the following format:
 <file_analysis>
+FileId: [fileId]
 Filename: [filename]
 Reasoning: [Your explanation of why this file is important]
 </file_analysis>
 
 After analyzing all files, provide your final selection of important files to be parsed in the following format:
 <important_files>
-[List of filenames, one per line]
+[List of fileIds, one per line]
 </important_files>
 
 Remember to consider alternative names for the important file types and use your best judgment to identify files that are likely to contain crucial information for the real estate disclosure package.
