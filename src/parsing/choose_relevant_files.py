@@ -1,9 +1,7 @@
-from pathlib import Path
 from typing import List
 import sys
 
-from llama_index.prompts import PromptTemplate
-from llama_index.llms import OpenAI
+from llama_index.core.prompts import PromptTemplate
 
 from src.utils.directory_info import get_directory_info
 from src.environment import get_open_ai_model
@@ -43,7 +41,7 @@ def analyze_directory(directory_path: str) -> str:
     formatted_prompt = prompt.format(fileList=file_list_csv)
     
     # Get OpenAI model and generate response
-    llm = OpenAI(model=get_open_ai_model())
+    llm = get_open_ai_model()
     response = llm.complete(formatted_prompt)
     
     return response.text
