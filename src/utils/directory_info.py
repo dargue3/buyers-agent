@@ -16,8 +16,8 @@ def print_directory_info(directory_path: str) -> None:
         print(f"Error: {directory_path} is not a valid directory")
         return
 
-    # Get all files in directory
-    files = list(dir_path.rglob("*"))
+    # Get only files in the current directory (no recursion)
+    files = [f for f in dir_path.iterdir()]
     
     # Print header
     print(f"\nDirectory contents for: {dir_path.absolute()}\n")
