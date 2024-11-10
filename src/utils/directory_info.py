@@ -1,10 +1,16 @@
 from pathlib import Path
 import os
 from datetime import datetime
+import csv
+import sys
+
+# Files to ignore
+IGNORED_FILES = {'.DS_Store', '.gitignore', '__pycache__', '.git'}
 
 def print_directory_info(directory_path: str) -> None:
     """
-    Print information about all files in the given directory.
+    Print information about files in the given directory in CSV format.
+    Sizes are in MB and system files are ignored.
     
     Args:
         directory_path (str): Path to the directory to analyze
@@ -17,12 +23,12 @@ def print_directory_info(directory_path: str) -> None:
         return
 
     # Get only files in the current directory (no recursion)
-    files = [f for f in dir_path.iterdir()]
+    files = [f for f in dir_path.iterdir() if f.name not in IGNORED_FILES]
     
-    # Print header
-    print(f"\nDirectory contents for: {dir_path.absolute()}\n")
-    print(f"{'Filename':<40} {'Extension':<10} {'Size (bytes)':<12} {'Last Modified':<20}")
-    print("-" * 82)
+    # Print header as CSV
+    writer = csv.writer(sys.stdout)
+    writer.writerow(['Filename', 'Extension', 'Size (MB)', 'Last Modified'])
+    writer.writerow([])  # Empty row for spacing
     
     # Print info for each file
     for file_path in sorted(files):
@@ -30,12 +36,13 @@ def print_directory_info(directory_path: str) -> None:
             # Get file information
             name = file_path.name
             extension = file_path.suffix if file_path.suffix else "(no ext)"
-            size = os.path.getsize(file_path)
+            size_mb = os.path.getsize(file_path) / (1024 * 1024)  # Convert to MB
             mod_time = datetime.fromtimestamp(os.path.getmtime(file_path))
             mod_time_str = mod_time.strftime("%Y-%m-%d %H:%M:%S")
             
-            # Print formatted line
-            print(f"{name:<40} {extension:<10} {size:<12} {mod_time_str:<20}")
+            # Write CSV row
+            writer.writerow([name, extension, f"{size_mb:.2f}", mod_time_str])
+            writer.writerow([])  # Empty row for spacing
 
 if __name__ == "__main__":
     # Example usage
