@@ -15,7 +15,7 @@ def init_environment():
 
 def get_default_pdf_path():
     """Get default PDF path"""
-    return "pdfs/greer/26 3468 Greer Road - Property Inspection Report [Shawn Cooley].pdf"
+    return "pdfs/greer/property_inspection.pdf"
 
 def setup_llama_index():
     """Setup Llama Index"""

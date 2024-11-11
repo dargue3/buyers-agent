@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Tuple
 import sys
 
 from llama_index.core.prompts import PromptTemplate
@@ -35,6 +35,7 @@ def analyze_directory(directory_path: str) -> str:
     with open(prompt_path, 'r') as f:
         prompt_text = f.read()
     
+    print(file_list_csv)
     prompt = PromptTemplate(prompt_text)
     
     # Format prompt with file list
